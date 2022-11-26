@@ -1,0 +1,45 @@
+# deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anyproxy-deployment
+  labels:
+    app: anyproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: anyproxy
+  template:
+    metadata:
+      labels:
+        app: anyproxy
+    spec:
+      containers:
+      - name: anyproxy
+        image: arieszhang/anyproxy:latest
+        ports:
+        - name: proxy
+          containerPort: 8001
+        - name: web
+          containerPort: 8002
+
+---
+# service - NodePort
+apiVersion: v1
+kind: Service
+metadata:
+  name: anyproxy-service
+spec:
+  type: NodePort
+  selector:
+    app: anyproxy
+  ports:
+    - name: proxy
+      port: 8001
+      targetPort: 8001
+      nodePort: 30081
+    - name: web
+      port: 8002
+      targetPort: 8002
+      nodePort: 30082
